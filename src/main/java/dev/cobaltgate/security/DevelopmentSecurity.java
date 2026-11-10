@@ -13,7 +13,7 @@ public class DevelopmentSecurity {
  @Bean UserDetailsService users(Environment env) {
   var encoder=new BCryptPasswordEncoder();
   var user=User.withUsername(env.getProperty("DEMO_ADMIN_USER","portfolio"))
-    .password(encoder.encode(env.getProperty("DEMO_ADMIN_PASSWORD","ChangeMeLocal")))
+    .password("{bcrypt}" + encoder.encode(env.getProperty("DEMO_ADMIN_PASSWORD","ChangeMeLocal")))
     .roles("ADMIN").build();
   return new InMemoryUserDetailsManager(user);
  }
