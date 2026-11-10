@@ -26,18 +26,18 @@ class EntitlementsApiTest {
  }
  @Test void allocatesAtMostLicensedSeats() throws Exception {
   MvcResult created = mvc.perform(post("/api/v1/subscriptions").with(httpBasic("portfolio","ChangeMeLocal"))
-   .contentType(MediaType.APPLICATION_JSON).content("{"company":"Nova Cloud","seatLimit":1}"))
+   .contentType(MediaType.APPLICATION_JSON).content("{\"company\":\"Nova Cloud\",\"seatLimit\":1}"))
    .andExpect(status().isCreated()).andReturn();
   long id=json.readTree(created.getResponse().getContentAsString()).get("id").asLong();
   String url="/api/v1/subscriptions/"+id+"/members";
   mvc.perform(post(url).with(httpBasic("portfolio","ChangeMeLocal"))
-   .contentType(MediaType.APPLICATION_JSON).content("{"email":"A@EXAMPLE.org"}"))
+   .contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"A@EXAMPLE.org\"}"))
    .andExpect(status().isOk()).andExpect(jsonPath("$.email").value("a@example.org"));
   mvc.perform(post(url).with(httpBasic("portfolio","ChangeMeLocal"))
-   .contentType(MediaType.APPLICATION_JSON).content("{"email":"a@example.org"}"))
+   .contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"a@example.org\"}"))
    .andExpect(status().isOk());
   mvc.perform(post(url).with(httpBasic("portfolio","ChangeMeLocal"))
-   .contentType(MediaType.APPLICATION_JSON).content("{"email":"b@example.org"}"))
+   .contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"b@example.org\"}"))
    .andExpect(status().isConflict());
   mvc.perform(get("/api/v1/subscriptions/"+id).with(httpBasic("portfolio","ChangeMeLocal")))
    .andExpect(status().isOk()).andExpect(jsonPath("$.seatsUsed").value(1));
