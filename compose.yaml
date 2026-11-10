@@ -1,0 +1,26 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cobaltgate}
+      MYSQL_USER: ${MYSQL_USER:-cobalt}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      retries: 20
+    volumes: ["mysql-data:/var/lib/mysql"]
+  api:
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-cobaltgate}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-cobalt}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      DEMO_ADMIN_USER: ${DEMO_ADMIN_USER:-portfolio}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD}
+    ports: ["8092:8092"]
+    depends_on:
+      mysql: {condition: service_healthy}
+volumes:
+  mysql-data:
